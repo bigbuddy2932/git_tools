@@ -1,0 +1,45 @@
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/.vars
+
+groot(){
+	gitbase=$(git rev-parse --show-toplevel) || return 1
+	cd $gitbase
+}
+
+colorp(){
+	printf "${2}${1}${CLR_NONE}"
+}
+gtstatus(){
+	cwd=$(pwd)
+	groot || return 1
+	GT_UNTRACKED=$(git ls-files --others --exclude-standard)
+	GT_ADDED=$(git diff --name-only --diff-filter=A --cached)
+	if [[ -n "$GT_UNTRACKED" ]]; then
+		echo "Untracked:"
+		echo -e  "${CLR_PURPLE}${GT_UNTRACKED}${CLR_NONE}"
+	fi
+	if [[ -n "$GT_ADDED" ]]; then
+                echo "Added:"
+                echo -e  "${CLR_CYAN}${GT_ADDED}${CLR_NONE}"
+        fi
+	unset GT_UNTRACKED
+	unset GT_ADDED
+	cd $cwd
+ 	unset cwd
+}
+gtbrof(){
+	if [[ -z $1 ]]; then
+		echo "New branch name required"
+		return 1
+	fi
+	if [[ -z $2 ]]; then
+		echo "Target remote branch required"
+		return 2
+	fi
+	remote=${3:-origin}
+	git fetch
+	echo "git checkout -b $1 $remote/$2"
+	git checkout -b $1 $remote/$2
+}
