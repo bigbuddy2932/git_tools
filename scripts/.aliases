@@ -4,8 +4,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/.vars
 
 groot(){
-	gitbase=$(git rev-parse --show-toplevel) || return 1
-	cd $gitbase
+	GT_GITBASE=$(git rev-parse --show-toplevel) || return 1
+	cd $GT_GITBASE
 }
 
 colorp(){
