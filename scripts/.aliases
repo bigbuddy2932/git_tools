@@ -40,6 +40,6 @@ gtbrof(){
 	fi
 	remote=${3:-origin}
 	git fetch
-	echo "git checkout -b $1 $remote/$2"
 	git checkout -b $1 $remote/$2
+	git push -u $remote $1
 }

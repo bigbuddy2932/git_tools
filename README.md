@@ -4,8 +4,8 @@ These tools are made for bash and bash only, no other interpreter is currently s
 
 ## Commands
 
-### grbrod
-Running `gtbrof` will create a new local branch off of a specified remote branch. It will run git fetch before doing this.
+### grbrof
+Running `gtbrof` will create a new local branch off of a specified remote branch, then push the newly created branch to the remote. It will run git fetch before doing this.
 
 ```
 gtbrof <new branch name> <remote branch name> [remote; default=origin]
