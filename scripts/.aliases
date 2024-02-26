@@ -43,3 +43,13 @@ gtbrof(){
 	git checkout -b $1 $remote/$2
 	git push -u $remote $1
 }
+gtchp(){
+	if [[ -z $1 ]]; then
+		echo "Target branch required"
+		return 2
+	fi
+	remote=${2:-origin}
+	git fetch
+	git checkout -b $1 $remote/$1 || git checkout $1
+	git pull
+}
