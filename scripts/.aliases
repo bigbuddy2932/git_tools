@@ -3,53 +3,69 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/.vars
 
+alias gtfp="git fetch -p"
 groot(){
 	GT_GITBASE=$(git rev-parse --show-toplevel) || return 1
 	cd $GT_GITBASE
 }
-
 colorp(){
 	printf "${2}${1}${CLR_NONE}"
 }
-gtstatus(){
-	cwd=$(pwd)
-	groot || return 1
-	GT_UNTRACKED=$(git ls-files --others --exclude-standard)
-	GT_ADDED=$(git diff --name-only --diff-filter=A --cached)
-	if [[ -n "$GT_UNTRACKED" ]]; then
-		echo "Untracked:"
-		echo -e  "${CLR_PURPLE}${GT_UNTRACKED}${CLR_NONE}"
-	fi
-	if [[ -n "$GT_ADDED" ]]; then
-                echo "Added:"
-                echo -e  "${CLR_CYAN}${GT_ADDED}${CLR_NONE}"
-        fi
-	unset GT_UNTRACKED
-	unset GT_ADDED
-	cd $cwd
- 	unset cwd
-}
 gtbrof(){
-	if [[ -z $1 ]]; then
+	if [[ -z ${1+x} ]]; then
 		echo "New branch name required"
 		return 1
-	fi
-	if [[ -z $2 ]]; then
+	elif [[ -z ${2+x} ]]; then
 		echo "Target remote branch required"
 		return 2
 	fi
 	remote=${3:-origin}
 	git fetch
-	git checkout -b $1 $remote/$2
-	git push -u $remote $1
+	git checkout -b ${1} ${remote}/${2} || return 3
+	git push -u ${remote} ${1}
 }
 gtchp(){
-	if [[ -z $1 ]]; then
+	if [[ -z ${1+x} ]]; then
 		echo "Target branch required"
-		return 2
+		return 1
 	fi
 	remote=${2:-origin}
 	git fetch
-	git checkout -b $1 $remote/$1 || git checkout $1
+	git checkout -b ${1} ${remote}/${1} 2> /dev/null || git checkout ${1}
 	git pull
+}
+gtchc(){
+	if [[ -z ${1+x} ]]; then
+		echo "Target commit hash required"
+		return 1
+	fi
+	new_branch=${2:-branch_${1}}
+	remote=${3:-origin}
+	git fetch
+	git checkout -b ${new_branch} ${1} || return 2
+	if [[ -n ${2} ]]; then
+		git push -u ${remote} ${new_branch}
+	fi
+}
+gtdb(){
+	if [[ -z ${1+x} ]]; then
+		echo "Target branch required"
+		return 2
+	fi
+	current_branch=$(git rev-parse --abbrev-ref HEAD)
+	if [ "${current_branch}" = ${1} ] && [ -z ${2+x} ]; then
+		echo "Escape branch is required when you are deleteing the current branch."
+		return 3
+	elif [[ "${1}" = "${2}" ]]; then
+		echo "Target and escape branches cannot be the same."
+		return 4
+	fi
+	remote=${3:-origin}
+	if [[ -n ${2} ]]; then
+		gtchp ${2} ${remote} || return 5
+	fi
+	echo "Deleteing ${1}"
+	git branch -d ${1} || return 6
+	echo "Deleteing ${remote}/${1}"
+	git push ${remote} --delete ${1}
 }
