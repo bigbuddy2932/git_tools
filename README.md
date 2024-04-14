@@ -61,6 +61,15 @@ Escape branch is generally not required, but is requried if `gtdb` is used to de
 gtdb <branch to delete> [escape branch] [remote; default=origin]
 ```
 
+### gtm
+GiT Merge
+
+Runs `git fetch` and then runs `git merge` on the specified branch.
+
+```
+gtm <branch to merge from> [remote; default=origin]
+```
+
 ### groot
 Git ROOT
 

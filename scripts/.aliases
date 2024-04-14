@@ -69,3 +69,12 @@ gtdb(){
 	echo "Deleteing ${remote}/${1}"
 	git push ${remote} --delete ${1}
 }
+gtm(){
+	if [[ -z ${1+x} ]]; then
+		echo "Target branch required"
+		return 1
+	fi
+	remote=${2:-origin}
+	git fetch ${remote}
+	git merge ${remote}/${1}
+}
